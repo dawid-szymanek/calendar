@@ -70,9 +70,15 @@ code {
 
 .year_month {
   border: 2px solid #000;
-  height: 250px;
-  width: 250px;
-  font-size: 60px;
+  height: 150px;
+  width: 150px;
+  font-size: larger;
+  font-weight: bold;
+}
+
+.year_event {
+  color: #f00;
+  text-shadow: 1px 1px #000;
 }
 
 #week_display {
