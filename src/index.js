@@ -8,7 +8,7 @@ class Page extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayType: "Day",
+      displayType: "Year",
       selectedDate: new Date(),
       dateToGoTo: new Date(),
       eventName: "",
@@ -34,8 +34,6 @@ class Page extends React.Component {
     this.changeSelectedDate();
   }
   changeSelectedDate() {
-    console.log(this.state.selectedDate);
-    console.log(this.state.dateToGoTo);
     this.setState({selectedDate: this.state.dateToGoTo});
   }
   changeDateToGoTo(e) {
@@ -58,7 +56,9 @@ class Page extends React.Component {
   }
   changeEventTime(e) {
     e.preventDefault();
-    this.setState({eventTime: e.target.value});
+    let hour = e.target.value.substr(0,2);
+    let minute = e.target.value.substr(3,5);
+    this.setState({eventTime: new Date(0, 0, 0, hour, minute)});
   }
   changeEventDesc(e) {
     e.preventDefault();
@@ -153,30 +153,49 @@ function Side(props) {
 }
 
 function YearDisplay(props) {
+  let date = props.selectedDate;
+  let year = date.getFullYear();
+  function filter(element) {
+    return element.time.getFullYear() == year;
+  }
+  let list = props.eventList.filter(filter);
+  let eventAmount = 0;
+  for(let i=0; i<list.length; i++) {
+    eventAmount++;
+  }
+  function checkEvents(month) {
+    if(eventAmount>0) {
+      let j=0;
+      for(let i=0; i<eventAmount; i++) {
+        if(list[i].time.getMonth()==month) j++;
+      }
+      return j>0 ? <div className="year_event">!!!</div> : "";
+    }
+  }
   return(
     <table id="year_display"><tbody>
       <tr>
-        <th colSpan="4"><h1>{props.selectedDate.getFullYear()}</h1></th>
+        <th colSpan="4"><h1>{year}</h1></th>
       </tr>
       <tr>
-        <td className="year_month">January</td>
-        <td className="year_month">February</td>
-        <td className="year_month">March</td>
-        <td className="year_month">Apr</td>
-      </tr>
-
-      <tr>
-        <td className="year_month">May</td>
-        <td className="year_month">June</td>
-        <td className="year_month">July</td>
-        <td className="year_month">August</td>
+        <td className="year_month">January {checkEvents(0)}</td>
+        <td className="year_month">February {checkEvents(1)}</td>
+        <td className="year_month">March {checkEvents(2)}</td>
+        <td className="year_month">Apr {checkEvents(3)}</td>
       </tr>
 
       <tr>
-        <td className="year_month">September</td>
-        <td className="year_month">October</td>
-        <td className="year_month">November</td>
-        <td className="year_month">December</td>
+        <td className="year_month">May {checkEvents(4)}</td>
+        <td className="year_month">June {checkEvents(5)}</td>
+        <td className="year_month">July {checkEvents(6)}</td>
+        <td className="year_month">August {checkEvents(7)}</td>
+      </tr>
+
+      <tr>
+        <td className="year_month">September {checkEvents(8)}</td>
+        <td className="year_month">October {checkEvents(9)}</td>
+        <td className="year_month">November {checkEvents(10)}</td>
+        <td className="year_month">December {checkEvents(11)}</td>
       </tr>
     </tbody></table>
   )
@@ -187,7 +206,7 @@ function MonthDisplay(props) {
   return(
     <table id="month_display"><tbody>
       <tr>
-        <th colSpan="7" id="month_name">{date.toLocaleString('default', { month: 'long' })} {date.getFullYear()}</th>
+        <th colSpan="7" id="month_name">{date.toLocaleString('en-US', { month: 'long' })} {date.getFullYear()}</th>
       </tr>
       <tr>
         <th className="month_weekday">Mon</th>
@@ -264,37 +283,85 @@ function MonthDisplay(props) {
 }
 
 function WeekDisplay(props) {
+  let date = props.selectedDate;
+  function filter(element) {
+    return date.getDay()==element.time.getDay();
+  }
+  let list = props.eventList.filter(filter);
+  let eventAmount = 0;
+  for(let i=0; i<list.length; i++)
+  {
+    eventAmount++;
+  }
+  function weekDate(weekDay) {
+    if(weekDay == date.getDay()) {
+      return date.toLocaleString('en-US', { month: 'long' })+" "+date.getDate();
+    }
+    else for(let i=1; i<7; i++) {
+      if(weekDay-i == date.getDay()) {
+        let temp = new Date();
+        temp.setDate(date.getDate());
+        temp.setDate(temp.getDate()+i);
+        return temp.toLocaleString('en-US', { month: 'long' })+" "+(temp.getDate());
+      }
+      else if(weekDay+i == date.getDay()) {
+        let temp = new Date();
+        temp.setDate(date.getDate());
+        temp.setDate(temp.getDate()-i);
+        return temp.toLocaleString('en-US', { month: 'long' })+" "+(temp.getDate());
+      }
+    }
+  }
+  function weekDateAM(weekDay) {
+    for(let i=0; i<list.length; i++) {
+      console.log(list[i].time.getDay());
+      console.log(weekDay);
+      if(list[i].time.getDay() == weekDay) {
+        return 1;
+      }
+    }
+  }
+  function weekDatePM(weekDay) {
+    for(let i=0; i<list.length; i++) {
+      console.log(list[i].time.getDay());
+      console.log(weekDay);
+      if(list[i].time.getDay() == weekDay) {
+        return 1;
+      }
+    }
+  }
+  let weekDays = <tr>
+  <th className="week_day">Monday,<br/>{weekDate(1)}</th>
+  <th className="week_day">Tuesday,<br/>{weekDate(2)}</th>
+  <th className="week_day">Wednesday,<br/>{weekDate(3)}</th>
+  <th className="week_day">Thursday,<br/>{weekDate(4)}</th>
+  <th className="week_day">Friday,<br/>{weekDate(5)}</th>
+  <th className="week_day">Saturday,<br/>{weekDate(6)}</th>
+  <th className="week_day">Sunday,<br/>{weekDate(7)}</th>
+  </tr>;
+  let am = <tr>
+  <td className="week_am">AM {weekDateAM(1)}</td>
+  <td className="week_am">AM {weekDateAM(2)}</td>
+  <td className="week_am">AM {weekDateAM(3)}</td>
+  <td className="week_am">AM {weekDateAM(4)}</td>
+  <td className="week_am">AM {weekDateAM(5)}</td>
+  <td className="week_am">AM {weekDateAM(6)}</td>
+  <td className="week_am">AM {weekDateAM(7)}</td>
+  </tr>;
+  let pm = <tr>
+  <td className="week_pm">PM {weekDatePM(1)}</td>
+  <td className="week_pm">PM {weekDatePM(2)}</td>
+  <td className="week_pm">PM {weekDatePM(3)}</td>
+  <td className="week_pm">PM {weekDatePM(4)}</td>
+  <td className="week_pm">PM {weekDatePM(5)}</td>
+  <td className="week_pm">PM {weekDatePM(6)}</td>
+  <td className="week_pm">PM {weekDatePM(7)}</td>
+  </tr>;
   return(
     <table id="week_display"><tbody>
-      <tr>
-        <th className="week_day">Monday</th>
-        <th className="week_day">Tuesday</th>
-        <th className="week_day">Wednesday</th>
-        <th className="week_day">Thursday</th>
-        <th className="week_day">Friday</th>
-        <th className="week_day">Saturday</th>
-        <th className="week_day">Sunday</th>
-      </tr>
-
-      <tr>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-        <td className="week_am">AM</td>
-      </tr>
-
-      <tr>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-        <td className="week_pm">PM</td>
-      </tr>
+      {weekDays}
+      {am}
+      {pm}
     </tbody></table>
   )
 }
@@ -307,7 +374,7 @@ function DayDisplay(props) {
   }
   let list = props.eventList.filter(filter);
   let eventAmount = 0;
-  let monthName = date.toLocaleString('default', { month: 'long' });
+  let monthName = date.toLocaleString('en-US', { month: 'long' });
   for(let i=0; i<list.length; i++)
   {
     eventAmount++;
@@ -332,10 +399,13 @@ function DayDisplay(props) {
 }
 
 function GoToDate(props) {
+  let year=props.dateToGoTo.getFullYear();
+  let month=props.dateToGoTo.getMonth()+1; month=(month < 10 ? '0' : '')+month;
+  let day=(props.dateToGoTo.getDate() < 10 ? '0' : '')+props.dateToGoTo.getDate();
   return(
     <form>
       <h1>Go to date</h1>
-      <input type="date" name="date_input" value={props.dateToGoTo} onChange={props.changeDateToGoTo}/><br/>
+      <input type="date" value={year+"-"+month+"-"+day} onChange={props.changeDateToGoTo}/><br/>
       <button type="button" value="Year" onClick={props.changeDisplayType}>Year</button>
       <button type="button" value="Month" onClick={props.changeDisplayType}>Month</button><br/>
       <button type="button" value="Week" onClick={props.changeDisplayType}>Week</button>
@@ -345,12 +415,17 @@ function GoToDate(props) {
 }
 
 function AddEvent(props) {
+  let year=props.eventDate.getFullYear();
+  let month=props.eventDate.getMonth()+1; month=(month < 10 ? '0' : '')+month;
+  let day=(props.eventDate.getDate() < 10 ? '0' : '')+props.eventDate.getDate();
+  let hour=(props.eventTime.getHours() < 10 ? '0' : '') + props.eventTime.getHours();
+  let minute=(props.eventTime.getMinutes() < 10 ? '0' : '') + props.eventTime.getMinutes();
   return(
     <form>
       <h1>Add Event</h1>
       <input type="text" value={props.eventName} onChange={props.changeEventName}/><br/>
-      <input type="date" value={props.eventDate} onChange={props.changeEventDate}/><br/>
-      <input type="time" value={props.eventTime} onChange={props.changeEventTime}/><br/>
+      <input type="date" value={year+"-"+month+"-"+day} onChange={props.changeEventDate}/><br/>
+      <input type="time" value={hour+":"+minute} onChange={props.changeEventTime}/><br/>
       <textarea rows="4" columns="50" value={props.eventDesc} onChange={props.changeEventDesc}/><br/>
       <button type="button" onClick={props.addEvent}>Add</button>
     </form>
