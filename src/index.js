@@ -284,53 +284,61 @@ function MonthDisplay(props) {
 
 function WeekDisplay(props) {
   let date = props.selectedDate;
+  let eventAmount = 0;
+  let isSunday;
   function filter(element) {
     return date.getDay()==element.time.getDay();
   }
   let list = props.eventList.filter(filter);
-  let eventAmount = 0;
-  for(let i=0; i<list.length; i++)
-  {
-    eventAmount++;
-  }
   function weekDate(weekDay) {
-    if(weekDay == date.getDay()) {
-      return date.toLocaleString('en-US', { month: 'long' })+" "+date.getDate();
+    if(date.getDay() == 0) {
+      isSunday = true;
     }
-    else for(let i=1; i<7; i++) {
+    if(weekDay == date.getDay() || (weekDay == 7 && isSunday)) {
+      return date.toLocaleString('en-US', { month: 'long' })+" "+date.getDate()+" "+date.getFullYear();
+    }
+    else if(!isSunday) for(let i=1; i<7; i++) {
       if(weekDay-i == date.getDay()) {
-        let temp = new Date();
+        let temp = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         temp.setDate(date.getDate());
         temp.setDate(temp.getDate()+i);
-        return temp.toLocaleString('en-US', { month: 'long' })+" "+(temp.getDate());
+        return temp.toLocaleString('en-US', { month: 'long' })+" "+temp.getDate()+" "+date.getFullYear();
       }
       else if(weekDay+i == date.getDay()) {
-        let temp = new Date();
+        let temp = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         temp.setDate(date.getDate());
         temp.setDate(temp.getDate()-i);
-        return temp.toLocaleString('en-US', { month: 'long' })+" "+(temp.getDate());
+        return temp.toLocaleString('en-US', { month: 'long' })+" "+temp.getDate()+" "+date.getFullYear();
       }
-    }
+    } else for(let i=1, j=6; i<7; i++, j--) {
+        if(weekDay-i == 0) {
+          let temp = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          temp.setDate(date.getDate());
+          temp.setDate(temp.getDate()-j);
+          return temp.toLocaleString('en-US', { month: 'long' })+" "+temp.getDate()+" "+date.getFullYear();
+        }
+      }
   }
   function weekDateAM(weekDay) {
+    /*let events = "";
     for(let i=0; i<list.length; i++) {
-      console.log(list[i].time.getDay());
-      console.log(weekDay);
-      if(list[i].time.getDay() == weekDay) {
-        return 1;
+      if(list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0) && list[i].time.getHours()<12) {
+        events += list[i].name=", ";
       }
     }
+    return events;*/
   }
   function weekDatePM(weekDay) {
+    /*let events = "";
     for(let i=0; i<list.length; i++) {
-      console.log(list[i].time.getDay());
-      console.log(weekDay);
-      if(list[i].time.getDay() == weekDay) {
-        return 1;
+      if(list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0) && list[i].time.getHours()>=12) {
+        events += list[i].name+", ";
       }
     }
+    return events;*/
   }
   let weekDays = <tr>
+  <th className="week_day"></th>
   <th className="week_day">Monday,<br/>{weekDate(1)}</th>
   <th className="week_day">Tuesday,<br/>{weekDate(2)}</th>
   <th className="week_day">Wednesday,<br/>{weekDate(3)}</th>
@@ -340,22 +348,24 @@ function WeekDisplay(props) {
   <th className="week_day">Sunday,<br/>{weekDate(7)}</th>
   </tr>;
   let am = <tr>
-  <td className="week_am">AM {weekDateAM(1)}</td>
-  <td className="week_am">AM {weekDateAM(2)}</td>
-  <td className="week_am">AM {weekDateAM(3)}</td>
-  <td className="week_am">AM {weekDateAM(4)}</td>
-  <td className="week_am">AM {weekDateAM(5)}</td>
-  <td className="week_am">AM {weekDateAM(6)}</td>
-  <td className="week_am">AM {weekDateAM(7)}</td>
+  <td className="week_day"><b>AM</b></td>
+  <td className="week_am">{weekDateAM(1)}</td>
+  <td className="week_am">{weekDateAM(2)}</td>
+  <td className="week_am">{weekDateAM(3)}</td>
+  <td className="week_am">{weekDateAM(4)}</td>
+  <td className="week_am">{weekDateAM(5)}</td>
+  <td className="week_am">{weekDateAM(6)}</td>
+  <td className="week_am">{weekDateAM(7)}</td>
   </tr>;
   let pm = <tr>
-  <td className="week_pm">PM {weekDatePM(1)}</td>
-  <td className="week_pm">PM {weekDatePM(2)}</td>
-  <td className="week_pm">PM {weekDatePM(3)}</td>
-  <td className="week_pm">PM {weekDatePM(4)}</td>
-  <td className="week_pm">PM {weekDatePM(5)}</td>
-  <td className="week_pm">PM {weekDatePM(6)}</td>
-  <td className="week_pm">PM {weekDatePM(7)}</td>
+  <td className="week_day"><b>PM</b></td>
+  <td className="week_pm">{weekDatePM(1)}</td>
+  <td className="week_pm">{weekDatePM(2)}</td>
+  <td className="week_pm">{weekDatePM(3)}</td>
+  <td className="week_pm">{weekDatePM(4)}</td>
+  <td className="week_pm">{weekDatePM(5)}</td>
+  <td className="week_pm">{weekDatePM(6)}</td>
+  <td className="week_pm">{weekDatePM(7)}</td>
   </tr>;
   return(
     <table id="week_display"><tbody>
