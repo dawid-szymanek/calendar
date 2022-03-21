@@ -287,7 +287,24 @@ function WeekDisplay(props) {
   let eventAmount = 0;
   let isSunday;
   function filter(element) {
-    return date.getDay()==element.time.getDay();
+    switch(element.time.getDay()) {
+      case 0:
+        return date.getDate()>=element.time.getDate()-6 && date.getDate()<=element.time.getDate();
+      case 1:
+        return date.getDate()<=element.time.getDate()+6 && date.getDate()>=element.time.getDate();
+      case 2:
+        return date.getDate()<=element.time.getDate()+5 && date.getDate()>=element.time.getDate()-1;
+      case 3:
+        return date.getDate()<=element.time.getDate()+4 && date.getDate()>=element.time.getDate()-2;
+      case 4:
+        return date.getDate()<=element.time.getDate()+3 && date.getDate()>=element.time.getDate()-3;
+      case 5:
+        return date.getDate()<=element.time.getDate()+2 && date.getDate()>=element.time.getDate()-4;
+      case 6:
+        return date.getDate()<=element.time.getDate()+1 && date.getDate()>=element.time.getDate()-5;
+      default:
+        break;
+    }
   }
   let list = props.eventList.filter(filter);
   function weekDate(weekDay) {
@@ -320,22 +337,22 @@ function WeekDisplay(props) {
       }
   }
   function weekDateAM(weekDay) {
-    /*let events = "";
+    let events = "";
     for(let i=0; i<list.length; i++) {
-      if(list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0) && list[i].time.getHours()<12) {
-        events += list[i].name=", ";
-      }
-    }
-    return events;*/
-  }
-  function weekDatePM(weekDay) {
-    /*let events = "";
-    for(let i=0; i<list.length; i++) {
-      if(list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0) && list[i].time.getHours()>=12) {
+      if((list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0)) && list[i].time.getHours()<12) {
         events += list[i].name+", ";
       }
     }
-    return events;*/
+    return events;
+  }
+  function weekDatePM(weekDay) {
+    let events = "";
+    for(let i=0; i<list.length; i++) {
+      if((list[i].time.getDay() == weekDay || (weekDay==7 && list[i].time.getDay()==0)) && list[i].time.getHours()>=12) {
+        events += list[i].name+", ";
+      }
+    }
+    return events;
   }
   let weekDays = <tr>
   <th className="week_day"></th>
